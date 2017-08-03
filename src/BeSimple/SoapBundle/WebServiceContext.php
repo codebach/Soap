@@ -53,6 +53,13 @@ class WebServiceContext
                 $this->serviceDefinition = $this->loader->load($this->options['resource'], $this->options['resource_type']);
                 $this->serviceDefinition->setName($this->options['name']);
                 $this->serviceDefinition->setNamespace($this->options['namespace']);
+                $this->serviceDefinition->setTargetName($this->options['target_name']);
+                $this->serviceDefinition->setOptions([
+                    'style'   => $this->options['style'],
+                    'use'     => $this->options['use'],
+                    'version' => $this->options['version'],
+                ]);
+                $this->serviceDefinition->setNamespaceTypes($this->options['namespace_types']);
 
                 $cache->write('<?php return unserialize('.var_export(serialize($this->serviceDefinition), true).');');
             }
@@ -114,5 +121,14 @@ class WebServiceContext
         }
 
         return $this->serverBuilder;
+    }
+
+    public function getOption($key)
+    {
+        if (isset($this->options[$key])) {
+            return $this->options[$key];
+        }
+
+        return null;
     }
 }

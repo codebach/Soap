@@ -84,6 +84,11 @@ class SoapClient extends \SoapClient
     protected $soapKernel = null;
 
     /**
+     * @var string
+     */
+    private $location = '';
+
+    /**
      * Constructor.
      *
      * @param string               $wsdl    WSDL file
@@ -91,6 +96,10 @@ class SoapClient extends \SoapClient
      */
     public function __construct($wsdl, array $options = array())
     {
+        if (isset($options['request_url'])) {
+            $this->location = $options['request_url'];
+        }
+
         // tracing enabled: store last request/response header and body
         if (isset($options['trace']) && $options['trace'] === true) {
             $this->tracingEnabled = true;
@@ -130,6 +139,10 @@ class SoapClient extends \SoapClient
      */
     private function __doHttpRequest(SoapRequest $soapRequest)
     {
+        if ('' != $this->location) {
+            $soapRequest->setLocation($this->location);
+        }
+
         // HTTP headers
         $soapVersion = $soapRequest->getVersion();
         $soapAction = $soapRequest->getAction();

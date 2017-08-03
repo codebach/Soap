@@ -31,7 +31,8 @@ class Method
         $this->name = $name;
 
         $this->headers = new Message($name.'Header');
-        $this->input = new Message($name.'Request');
+        //$this->input = new Message($name.'Request');
+        $this->input = new Message($name);
         $this->output = new Message($name.'Response');
         $this->fault = new Message($name.'Fault');
     }
@@ -61,14 +62,15 @@ class Method
         $this->headers->add($name, $type);
     }
 
-    public function addInput($name, $type)
+    public function addInput($name, $type, $nillable = false)
     {
-        $this->input->add($name, $type);
+        $this->input->add($name, $type, $nillable);
     }
 
-    public function setOutput($type)
+    public function setOutput($name, $type)
     {
-        $this->output->add('return', $type);
+        //$this->output->add('return', $type);
+        $this->output->add($name, $type);
     }
 
     public function getHeaders()

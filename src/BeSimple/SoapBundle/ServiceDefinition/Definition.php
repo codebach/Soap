@@ -21,6 +21,8 @@ use BeSimple\SoapCommon\Definition\Type\TypeRepository;
  */
 class Definition extends BaseDefinition
 {
+    protected $namespaceTypes = [];
+
     public function __construct(TypeRepository $typeRepository)
     {
         $this->typeRepository = $typeRepository;
@@ -40,5 +42,15 @@ class Definition extends BaseDefinition
         $this->namespace = $namespace;
 
         return $this;
+    }
+
+    public function setNamespaceTypes(array $namespaceTypes)
+    {
+        $this->namespaceTypes = $namespaceTypes;
+    }
+
+    public function getNamespaceTypes()
+    {
+        return $this->namespaceTypes;
     }
 }

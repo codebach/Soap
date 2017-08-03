@@ -20,6 +20,7 @@ class ComplexType
     private $name;
     private $value;
     private $isNillable = false;
+    private $target;
 
     public function getName()
     {
@@ -49,5 +50,15 @@ class ComplexType
     public function setNillable($isNillable)
     {
         $this->isNillable = (bool) $isNillable;
+    }
+
+    public function getTarget()
+    {
+        return $this->target;
+    }
+
+    public function setTarget($target)
+    {
+        $this->target = $target;
     }
 }

@@ -18,6 +18,7 @@ class ComplexType extends Configuration
     private $name;
     private $value;
     private $isNillable = false;
+    private $target;
 
     public function getName()
     {
@@ -52,5 +53,15 @@ class ComplexType extends Configuration
     public function getAliasName()
     {
         return 'complextype';
+    }
+
+    public function getTarget()
+    {
+        return $this->target;
+    }
+
+    public function setTarget($target)
+    {
+        $this->target = $target;
     }
 }

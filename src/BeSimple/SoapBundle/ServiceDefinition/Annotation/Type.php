@@ -1,8 +1,10 @@
 <?php
+
 /*
  * This file is part of the BeSimpleSoapBundle.
  *
  * (c) Christian Kerl <christian-kerl@web.de>
+ * (c) Francis Besset <francis.besset@gmail.com>
  *
  * This source file is subject to the MIT license that is bundled
  * with this source code in the file LICENSE.
@@ -13,25 +15,13 @@ namespace BeSimple\SoapBundle\ServiceDefinition\Annotation;
 /**
  * @Annotation
  */
-class Result extends Configuration implements TypedElementInterface
+class Type extends Configuration
 {
-    private $value = 'return';
-    private $phpType;
-    private $xmlType;
+    private $value;
 
     public function getValue()
     {
         return $this->value;
-    }
-
-    public function getPhpType()
-    {
-        return $this->phpType;
-    }
-
-    public function getXmlType()
-    {
-        return $this->xmlType;
     }
 
     public function setValue($value)
@@ -39,18 +29,8 @@ class Result extends Configuration implements TypedElementInterface
         $this->value = $value;
     }
 
-    public function setPhpType($phpType)
-    {
-        $this->phpType = $phpType;
-    }
-
-    public function setXmlType($xmlType)
-    {
-        $this->xmlType = $xmlType;
-    }
-
     public function getAliasName()
     {
-        return 'result';
+        return 'type';
     }
 }

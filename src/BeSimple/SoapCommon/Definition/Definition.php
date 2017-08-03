@@ -26,6 +26,7 @@ class Definition
 
     protected $options;
     protected $methods;
+    protected $targetName;
 
     public function __construct($name, $namespace, TypeRepository $typeRepository, array $options = array())
     {
@@ -88,6 +89,11 @@ class Definition
         return $this->name;
     }
 
+    public function setName($name)
+    {
+        $this->name = $name;
+    }
+
     public function getNamespace()
     {
         return $this->namespace;
@@ -144,5 +150,15 @@ class Definition
     public function getTypeRepository()
     {
         return $this->typeRepository;
+    }
+
+    public function getTargetName()
+    {
+        return $this->targetName;
+    }
+
+    public function setTargetName($targetName)
+    {
+        $this->targetName = $targetName;
     }
 }

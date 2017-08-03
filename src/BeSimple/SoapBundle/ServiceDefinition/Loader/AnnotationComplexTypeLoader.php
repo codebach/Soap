@@ -26,6 +26,7 @@ class AnnotationComplexTypeLoader extends AnnotationClassLoader
 {
     private $aliasClass       = 'BeSimple\SoapBundle\ServiceDefinition\Annotation\Alias';
     private $complexTypeClass = 'BeSimple\SoapBundle\ServiceDefinition\Annotation\ComplexType';
+    private $typeClass = 'BeSimple\SoapBundle\ServiceDefinition\Annotation\Type';
 
     /**
      * Loads a ServiceDefinition from annotations from a class.
@@ -50,6 +51,10 @@ class AnnotationComplexTypeLoader extends AnnotationClassLoader
             $annotations['alias'] = $alias->getValue();
         }
 
+        if ($type = $this->reader->getClassAnnotation($class, $this->typeClass)) {
+            $annotations['type'] = $type->getValue();
+        }
+
         $annotations['properties'] = new Collection('getName', 'BeSimple\SoapBundle\ServiceDefinition\ComplexType');
         foreach ($class->getProperties() as $property) {
             $complexType = $this->reader->getPropertyAnnotation($property, $this->complexTypeClass);
@@ -59,6 +64,7 @@ class AnnotationComplexTypeLoader extends AnnotationClassLoader
                 $propertyComplexType->setValue($complexType->getValue());
                 $propertyComplexType->setNillable($complexType->isNillable());
                 $propertyComplexType->setName($property->getName());
+                $propertyComplexType->setTarget($complexType->getTarget());
                 $annotations['properties']->add($propertyComplexType);
             }
         }

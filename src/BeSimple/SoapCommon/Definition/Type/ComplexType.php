@@ -19,10 +19,13 @@ use BeSimple\SoapCommon\Definition\Message;
  */
 class ComplexType extends Message implements TypeInterface
 {
-    public function __construct($phpType, $xmlType)
+    protected $type;
+
+    public function __construct($phpType, $xmlType, $type = '')
     {
         $this->phpType = $phpType;
         $this->xmlType = str_replace('\\', '.', $xmlType);
+        $this->type = $type;
 
         parent::__construct($xmlType);
     }
@@ -35,5 +38,10 @@ class ComplexType extends Message implements TypeInterface
     public function getXmlType()
     {
         return $this->xmlType;
+    }
+
+    public function getType()
+    {
+        return $this->type;
     }
 }

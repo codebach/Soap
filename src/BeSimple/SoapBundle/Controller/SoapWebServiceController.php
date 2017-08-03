@@ -12,10 +12,13 @@
 
 namespace BeSimple\SoapBundle\Controller;
 
+use ass\XmlSecurity\Key;
 use BeSimple\SoapBundle\Handler\ExceptionHandler;
 use BeSimple\SoapBundle\Soap\SoapRequest;
 use BeSimple\SoapBundle\Soap\SoapResponse;
+use BeSimple\SoapCommon\WsSecurityKey;
 use BeSimple\SoapServer\SoapServerBuilder;
+use BeSimple\SoapServer\WsSecurityFilter;
 use Symfony\Component\DependencyInjection\ContainerAware;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -71,6 +74,17 @@ class SoapWebServiceController extends ContainerAware
             ->withHandler($this)
             ->build()
         ;
+
+        if (!is_null($webServiceContext->getOption('public_key'))) {
+            $key = new WsSecurityKey();
+            $key->addPublicKey(Key::RSA_SHA1, $webServiceContext->getOption('public_key'));
+            $key->addPrivateKey(Key::RSA_SHA1,$webServiceContext->getOption('private_key'));
+
+            $wsse = new WsSecurityFilter(true, 300);
+            $wsse->setUserSecurityKeyObject($key);
+            $wsse->setSecurityOptionsSignature(WsSecurityFilter::TOKEN_REFERENCE_SECURITY_TOKEN, true);
+            $this->soapServer->getSoapKernel()->registerFilter($wsse);
+        }
 
         ob_start();
         $this->soapServer->handle($this->soapRequest->getSoapMessage());
@@ -170,10 +184,17 @@ class SoapWebServiceController extends ContainerAware
     public function __call($method, $arguments)
     {
         if ($this->serviceBinder->isServiceMethod($method)) {
-            // @TODO Add all SoapHeaders in SoapRequest
-            foreach ($this->headers as $name => $value) {
-                if ($this->serviceBinder->isServiceHeader($method, $name)) {
-                    $this->soapRequest->getSoapHeaders()->add($this->serviceBinder->processServiceHeader($method, $name, $value));
+            if (!empty($this->headers)) {
+                $firstHeaderName = array_keys($this->headers)[0];
+                if ((count($this->headers) === 1) && (substr($firstHeaderName, -6) === 'Header')) {
+                    // headers are wrapped and returned as stdClass!
+                    $this->headers = (array) $this->headers[$firstHeaderName];
+                }
+                // @TODO Add all SoapHeaders in SoapRequest
+                foreach ($this->headers as $name => $value) {
+                    if ($this->serviceBinder->isServiceHeader($method, $name)) {
+                        $this->soapRequest->getSoapHeaders()->add($this->serviceBinder->processServiceHeader($method, $name, $value));
+                    }
                 }
             }
             $this->headers = null;
