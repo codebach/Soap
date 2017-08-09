@@ -1,9 +1,8 @@
 {
-    "name": "besimple/soap",
+    "name": "codebach/soap",
     "type": "library",
     "description": "Build and consume SOAP and WSDL based web services",
     "keywords": ["soap"],
-    "homepage": "http://besim.pl",
     "license": "MIT",
     "authors": [
         {
@@ -17,6 +16,10 @@
         {
             "name": "Andreas Schamberger",
             "email": "mail@andreass.net"
+        },
+        {
+            "name": "Ahmet Akbana",
+            "email": "ahmetakbana@gmail.com"
         }
     ],
     "require": {
@@ -29,11 +32,11 @@
         "zendframework/zend-mime": "2.1.*"
     },
     "replace": {
-        "besimple/soap-bundle": "self.version",
-        "besimple/soap-client": "self.version",
-        "besimple/soap-common": "self.version",
-        "besimple/soap-server": "self.version",
-        "besimple/soap-wsdl":   "self.version"
+        "codebach/soap-bundle": "self.version",
+        "codebach/soap-client": "self.version",
+        "codebach/soap-common": "self.version",
+        "codebach/soap-server": "self.version",
+        "codebach/soap-wsdl":   "self.version"
     },
     "require-dev": {
         "ext-mcrypt": "*",
