@@ -13,13 +13,55 @@ Here you go, soap lovers. A lot of new features are extended to BesimpleSoap.
 - Ws Security with signing the response 
 - Multiple namespace support
 
-Build SOAP and WSDL based web services
-
 ### Installation
 
 Tell composer to install
 ```bash
 composer require codebach/soap
+```
+
+### Usage
+
+Example full configuration:
+```yaml
+be_simple_soap:
+    clients:
+        # Wsdl file and request url same place (Basic Usage)
+        slup_service:
+            wsdl: wsdl_service_url
+
+        # Wsdl file and request url different place
+        fc_bayern_service:
+            wsdl: wsdl_file_to_load
+            request_url:  url_to_make_soap_requests
+            basic_http_auth:
+                login: login
+                password: password
+
+    services:
+        # Single Namespace (Basic Usage)
+        slupClient:
+            namespace:     namespace
+            binding:       document-wrapped # Or rpc-literal
+            version:       2
+            resource:      "@FooBundle/Controller/FooController.php"
+            resource_type: annotation
+            cache_type:    none
+
+        # Multiple Namespace
+        capStore:
+            namespace:      namespace
+            binding:        document-wrapped # Or rpc-literal
+            version:        2
+            resource:       '@BarBundle/Controller/BarController.php'
+            resource_type:  annotation
+            cache_type:     none
+            target_name:    ns1 # Service definition name attribute
+            public_key:     public_key_to_sign_response
+            private_key:    private_key_to_sign_response
+            namespace_types:
+              - { name: 'ns2', url: name_space2_url}
+              - { name: 'ns3', url: name_space3_url}
 ```
 
 ### Components
