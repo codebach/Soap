@@ -27,11 +27,11 @@ Example full configuration:
 be_simple_soap:
     clients:
         # Wsdl file and request url same place (Basic Usage)
-        slup_service:
+        FooService:
             wsdl: wsdl_service_url
 
         # Wsdl file and request url different place
-        fc_bayern_service:
+        BarService:
             wsdl: wsdl_file_to_load
             request_url:  url_to_make_soap_requests
             basic_http_auth:
@@ -40,7 +40,7 @@ be_simple_soap:
 
     services:
         # Single Namespace (Basic Usage)
-        slupClient:
+        FooServer:
             namespace:     namespace
             binding:       document-wrapped # Or rpc-literal
             version:       2
@@ -49,7 +49,7 @@ be_simple_soap:
             cache_type:    none
 
         # Multiple Namespace
-        capStore:
+        BarServer:
             namespace:      namespace
             binding:        document-wrapped # Or rpc-literal
             version:        2
@@ -62,6 +62,117 @@ be_simple_soap:
             namespace_types:
               - { name: 'ns2', url: name_space2_url}
               - { name: 'ns3', url: name_space3_url}
+```
+
+#### Multiple Namespace Usage
+
+To put the ComplexType in different (e.g: configured in yaml file above), use new Annotation class `BeSimple\SoapBundle\ServiceDefinition\Annotation\Type` and new parameter `target` of `BeSimple\SoapBundle\ServiceDefinition\Annotation\ComplexType` class
+
+Bar.php
+```php
+use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
+
+/**
+ * @Soap\Alias("Bar")
+ * @Soap\Type("ns3")
+ */
+class Bar
+{
+    /**
+     * @var string
+     *
+     * @Soap\ComplexType("string")
+     */
+    private $value;
+
+    /**
+     * @return string
+     */
+    public function getValue(): string
+    {
+        return $this->value;
+    }
+
+    /**
+     * @param string $value
+     */
+    public function setValue(string $value)
+    {
+        $this->value = $value;
+    }
+}
+```
+
+Foo.php
+```php
+use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
+
+/**
+ * @Soap\Alias("Foo")
+ * @Soap\Type("ns2")
+ */
+class Foo
+{
+    /**
+     * @var Bar
+     *
+     * @Soap\ComplexType("FooBundle\Server\Bar", target="ns3")
+     */
+    private $bar;
+
+    /**
+     * @return Bar
+     */
+    public function getBar(): Bar
+    {
+        return $this->bar;
+    }
+
+    /**
+     * @param Bar $bar
+     */
+    public function setBar(Bar $bar)
+    {
+        $this->bar = $bar;
+    }
+}
+
+```
+
+SoapRequest.php
+```php
+use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
+
+/**
+ * @Soap\Alias("SoapRequest")
+ *
+ * Default namespace is ns1
+ */
+class SoapRequest
+{
+    /**
+     * @var Foo
+     *
+     * @Soap\ComplexType("FooBundle\Server\Foo", target="ns2")
+     */
+    private $foo;
+
+    /**
+     * @return Foo
+     */
+    public function getFoo(): Foo
+    {
+        return $this->foo;
+    }
+
+    /**
+     * @param Foo $foo
+     */
+    public function setFoo(Foo $foo)
+    {
+        $this->foo = $foo;
+    }
+}
 ```
 
 ### Components
