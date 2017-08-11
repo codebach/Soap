@@ -68,6 +68,42 @@ be_simple_soap:
 
 To put the ComplexType in different (e.g: configured in yaml file above), use new Annotation class `BeSimple\SoapBundle\ServiceDefinition\Annotation\Type` and new parameter `target` of `BeSimple\SoapBundle\ServiceDefinition\Annotation\ComplexType` class
 
+Make the server configuration:
+```yaml
+be_simple_soap:
+    services:
+        FooServer:
+            namespace:      default_namespace
+            binding:        document-wrapped
+            version:        2
+            resource:       '@FooBundle/Controller/DefaultController.php'
+            resource_type:  annotation
+            cache_type:     none
+            target_name:    ns1
+            namespace_types:
+              - { name: 'ns2', url: 'foo_namespace'}
+              - { name: 'ns3', url: 'bar_namespace'}
+```
+
+Add Method:
+```php
+use FooBundle\Server\SoapRequest;
+use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+
+class DefaultController extends Controller
+{
+    /**
+     * @Soap\Method("soapRequest")
+     * @Soap\Param("request", phpType = "FooBundle\Server\SoapRequest")
+     * @Soap\Result("soapResponse", phpType = "FooBundle\Server\SoapResponse")
+     */
+    public function soapRequestAction(SoapRequest $request)
+    {
+    }
+}
+```
+
 Bar.php
 ```php
 use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
@@ -174,6 +210,91 @@ class SoapRequest
     }
 }
 ```
+
+And here is the xml output of our server:
+```xml
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/"
+             xmlns:tns="default_namespace"
+             xmlns:ns="default_namespace/types"
+             xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+             xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+             xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/"
+             xmlns:ns2="foo_namespace"
+             xmlns:ns3="bar_namespace"
+             name="ns1"
+             targetNamespace="default_namespace">
+    <types>
+        <xsd:schema xmlns:ns2="foo_namespace" xmlns:ns3="bar_namespace" targetNamespace="default_namespace" elementFormDefault="qualified" attributeFormDefault="unqualified">
+            <xsd:complexType name="SoapRequest">
+                <xsd:sequence>
+                    <xsd:element name="foo" type="ns2:Foo"/>
+                </xsd:sequence>
+            </xsd:complexType>
+            <xsd:complexType name="AppBundle.Server.SoapResponse">
+                <xsd:sequence/>
+            </xsd:complexType>
+            <xsd:element name="soapRequest" type="tns:soapRequest"/>
+            <xsd:element name="soapRequestResponse" type="tns:soapRequestResponse"/>
+        </xsd:schema>
+
+
+        <xsd:schema xmlns:ns2="foo_namespace" targetNamespace="foo_namespace" elementFormDefault="qualified" attributeFormDefault="unqualified">
+            <xsd:complexType name="Foo">
+                <xsd:sequence>
+                    <xsd:element name="bar" type="ns3:Bar"/>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:schema>
+
+
+        <xsd:schema xmlns:ns3="bar_namespace" targetNamespace="bar_namespace" elementFormDefault="qualified" attributeFormDefault="unqualified">
+            <xsd:complexType name="Bar">
+                <xsd:sequence>
+                    <xsd:element name="value" type="xsd:string"/>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:schema>
+    </types>
+
+
+    <portType name="ns1PortType">
+        <operation name="soapRequest">
+            <input message="tns:soapRequest"/>
+            <output message="tns:soapRequestResponse"/>
+        </operation>
+    </portType>
+
+
+    <message name="soapRequest">
+        <part name="parameters" element="tns:soapRequest"/>
+    </message>
+    <message name="soapRequestResponse">
+        <part name="parameters" element="tns:soapRequestResponse"/>
+    </message>
+
+
+    <service name="ns1">
+        <port name="ns1Port" binding="tns:ns1Binding">
+            <soap:address location="http://localhost/Symfony/Symfony28/web/app_dev.php/ws/v1/FooServer"/>
+        </port>
+    </service>
+
+
+    <binding name="ns1Binding" type="tns:ns1PortType">
+        <soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"/>
+        <operation name="soapRequest">
+            <soap:operation soapAction="default_namespace/soapRequest"/>
+            <input>
+                <soap:body use="literal" namespace="default_namespace" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+            </input>
+            <output>
+                <soap:body use="literal" namespace="default_namespace" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+            </output>
+        </operation>
+    </binding>
+</definitions>
+```
+
 
 ### Components
 
